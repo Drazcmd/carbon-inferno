@@ -53,6 +53,7 @@ export const MONTH = 'month';
 export const YEAR = 'year';
 export const FIVE_YEAR = 'five_years';
 export const ALL = 'all';
+export const PROJECTION = 'projection';
 
 export const timeHeaderLinks = [
   { href: '#TODO', className: '', text: '1 Week', type: WEEK },
@@ -60,6 +61,7 @@ export const timeHeaderLinks = [
   { href: '#TODO', className: '', text: '1 Year', type: YEAR },
   { href: '#TODO', className: '', text: '5 Years', type: FIVE_YEAR },
   { href: '#TODO', className: '', text: 'All', type: ALL },
+  { href: '#TODO', className: '', text: 'Projected', type: PROJECTION },
 ];
 
 export const teamItems = [
@@ -108,6 +110,8 @@ export const teamItems = [
 ];
 
 export const globalSubHeader = 'GLOBAL CO₂ LEVEL';
+export const currentVsTippingSubHeader = 'CURRENT VS. TIPPING POINT';
+export const untilTippingSubHeader = 'UNTIL TIPPING POINT';
 
 export const datasets = [
   {

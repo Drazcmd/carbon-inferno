@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { globalSubHeader, ALL } from '../../constants';
+import { globalSubHeader, currentVsTippingSubHeader, untilTippingSubHeader, FIVE_YEAR, ALL, PROJECTION } from '../../constants';
 import './infoColumn.css';
-
 import { calculatePercentageDiff, calculateDiff } from './utils';
 
 const calculateSubHeader = (rangeType = '') => {
@@ -91,6 +90,7 @@ class InfoColumnHOC extends Component {
           />
         </div>
       );
+            statInfo={`${currentPpm} PPM`}
     }
     return (
       <div className="flex-grid">

@@ -33,6 +33,7 @@ import {
   MONTH,
   YEAR,
   FIVE_YEAR,
+  PROJECTION,
   ALL,
 } from '../../constants';
 
@@ -152,6 +153,7 @@ const mapStateToProps = state => ({
   [YEAR]: ppmInfoSelector(state, YEAR),
   [FIVE_YEAR]: ppmInfoSelector(state, FIVE_YEAR),
   [ALL]: ppmInfoAllSelector(state, ALL),
+  [PROJECTION]: ppmInfoAllSelector(state, ALL),
   currentPpm: state.ppmInfo.currentPpm,
 });
 const mapDispatchToProps = dispatch =>
