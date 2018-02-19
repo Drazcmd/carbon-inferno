@@ -3,11 +3,13 @@ import {
   CURRENT_PPM_SUCCESS,
   WEEK_MONTH_PPM_SUCCESS,
   ALL_PPM_SUCCESS,
+  PROJECTION_PPM_SUCCESS,
+  ONE_PRIOR_PPM_SUCCESS,
   PPM_LOAD_ITEMS_FAILURE,
   YEARS_PPM_SUCCESS,
 } from './commands';
 
-import { WEEK, MONTH, YEAR, FIVE_YEAR, ALL } from '../../../constants';
+import { WEEK, MONTH, YEAR, FIVE_YEAR, ALL, PROJECTION } from '../../../constants';
 
 export const initialState = {
   loading: true,
@@ -17,8 +19,10 @@ export const initialState = {
   [YEAR]: [],
   [FIVE_YEAR]: [],
   [ALL]: [],
+  [PROJECTION]: [],
   currentPpm: 0,
   totalPpmCount: 0,
+  priorDatePpm: 0,
 };
 
 function ppmReducer(state = initialState, action = {}) {
@@ -63,6 +67,25 @@ function ppmReducer(state = initialState, action = {}) {
         loading: false,
         error: '',
         [ALL]: results,
+      };
+    }
+    case PROJECTION_PPM_SUCCESS: {
+      const { results } = action;
+      return {
+        ...state,
+        loading: false,
+        error: '',
+        [PROJECTION]: results,
+      };
+    }
+    case ONE_PRIOR_PPM_SUCCESS: {
+      const { results } = action;
+      const { priorDatePpm } = results;
+      return {
+        ...state,
+        loading: false,
+        error: '',
+        priorDatePpm,
       };
     }
     case PPM_LOAD_ITEMS_FAILURE: {

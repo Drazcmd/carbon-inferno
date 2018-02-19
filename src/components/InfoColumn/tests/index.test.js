@@ -8,22 +8,23 @@ const getComponent = (props = {}) => shallow(<InfoColumnHOC {...props} />);
 describe('InfoColumnHOC Component', () => {
   describe('InfoColumnHOC render', () => {
     test('Should only render one info column div when rangeType is all', () => {
-      const component = getComponent({ rangeType: ALL, currentPpm: 22 });
+      const component = getComponent({ rangeType: ALL, currentPpm: 22, priorDatePpm: 0 });
       expect(component.find(InfoColDiv).length).toEqual(1);
     });
     test('Should render three info column div when rangeType is not all', () => {
-      const component = getComponent({ rangeType: FIVE_YEAR, currentPpm: 22 });
+      const component = getComponent({ rangeType: FIVE_YEAR, currentPpm: 22, priorDatePpm: 0 });
       expect(component.find(InfoColDiv).length).toEqual(3);
     });
   });
   describe('InfoColumnHOC willRecieveProps', () => {
     test('Should Update state if rangeType has changed', () => {
-      const component = getComponent({ rangeType: ALL, currentPpm: 22 });
+      const component = getComponent({ rangeType: ALL, currentPpm: 22, priorDatePpm: 0 });
       expect(component.state()).toEqual({
         ppmDiff: 0,
         diffPPMSubHeader: 'IN THE PAST ',
         ppmPercentDiff: 0,
         diffPercentSubHeader: 'IN THE PAST  (%)',
+        diffAveragePPMSubHeader: 'AVERAGE RATE IN THE LAST ',
       }); // confirm initalstate
       component.setProps({
         rangeType: FIVE_YEAR,
@@ -35,16 +36,21 @@ describe('InfoColumnHOC Component', () => {
         diffPPMSubHeader: 'IN THE PAST five years',
         ppmPercentDiff: '+45.45 %',
         diffPercentSubHeader: 'IN THE PAST five years (%)',
+        diffAveragePPMSubHeader: 'AVERAGE RATE IN THE LAST ',
+        yearsUntilTipping: '? YEARS',
+        ppmAverageRateDiff: '0 PPM / YEAR',
+
       }); // confirm initalstate
     });
   });
   test('Should not update state if rangeType has not changed', () => {
-    const component = getComponent({ rangeType: ALL, currentPpm: 22 });
+    const component = getComponent({ rangeType: ALL, currentPpm: 22, priorDatePpm: 0 });
     expect(component.state()).toEqual({
       ppmDiff: 0,
       diffPPMSubHeader: 'IN THE PAST ',
       ppmPercentDiff: 0,
       diffPercentSubHeader: 'IN THE PAST  (%)',
+      diffAveragePPMSubHeader: 'AVERAGE RATE IN THE LAST ',
     }); // confirm initalstate
     component.setProps({
       rangeType: ALL,
@@ -56,6 +62,7 @@ describe('InfoColumnHOC Component', () => {
       diffPPMSubHeader: 'IN THE PAST ',
       ppmPercentDiff: 0,
       diffPercentSubHeader: 'IN THE PAST  (%)',
+      diffAveragePPMSubHeader: 'AVERAGE RATE IN THE LAST ',
     });
   });
 });

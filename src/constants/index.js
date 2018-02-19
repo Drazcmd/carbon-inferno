@@ -113,6 +113,8 @@ export const globalSubHeader = 'GLOBAL CO₂ LEVEL';
 export const currentVsTippingSubHeader = 'CURRENT VS. TIPPING POINT';
 export const untilTippingSubHeader = 'UNTIL TIPPING POINT';
 
+export const hardcodedTippingPoint = 530;
+
 export const datasets = [
   {
     label: 'PPM',

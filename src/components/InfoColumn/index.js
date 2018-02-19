@@ -1,16 +1,20 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { globalSubHeader, currentVsTippingSubHeader, untilTippingSubHeader, FIVE_YEAR, ALL, PROJECTION } from '../../constants';
+import { globalSubHeader, currentVsTippingSubHeader, untilTippingSubHeader, hardcodedTippingPoint, FIVE_YEAR, ALL, PROJECTION } from '../../constants';
 import './infoColumn.css';
-import { calculatePercentageDiff, calculateDiff } from './utils';
+import { calculatePercentageDiff, calculateAverageRate, calculateDiff, calculateYearsUntil } from './utils';
 
 const calculateSubHeader = (rangeType = '') => {
   const formatStr = str => str.replace('_', ' ');
   return {
     diffPPMSubHeader: `IN THE PAST ${rangeType ? formatStr(rangeType) : ''}`,
+    diffAveragePPMSubHeader: `AVERAGE RATE IN THE LAST ${
+      rangeType === PROJECTION ? formatStr(FIVE_YEAR) : ''
+    }`,
     diffPercentSubHeader: `IN THE PAST ${
       rangeType ? formatStr(rangeType) : ''
     } (%)`,
+    timeUntilTippingPoint: 'UNTIL TIPPING POINT',
   };
 };
 
@@ -36,10 +40,11 @@ InfoColDiv.defaultProps = {
 class InfoColumnHOC extends Component {
   constructor(props) {
     super(props);
-    const { diffPPMSubHeader, diffPercentSubHeader } = calculateSubHeader();
+    const { diffPPMSubHeader, diffAveragePPMSubHeader, diffPercentSubHeader } = calculateSubHeader();
     this.state = {
       ppmDiff: 0,
       diffPPMSubHeader,
+      diffAveragePPMSubHeader,
       ppmPercentDiff: 0,
       diffPercentSubHeader,
     };
@@ -53,10 +58,14 @@ class InfoColumnHOC extends Component {
 
   updatePpmDiffInfo = (data = [], rangeType) => {
     const previous = data[0] ? data[0].ppm : 0;
-    const { currentPpm } = this.props;
-    const { diffPPMSubHeader, diffPercentSubHeader } = calculateSubHeader(
+    const { currentPpm, priorDatePpm } = this.props;
+    const { diffPPMSubHeader, diffAveragePPMSubHeader, diffPercentSubHeader } = calculateSubHeader(
       rangeType,
     );
+
+    const ppmAverageRateDiff = calculateAverageRate(priorDatePpm, currentPpm, 5); // TODO - no hard coding to five years
+    const yearsUntilTipping = calculateYearsUntil(currentPpm, hardcodedTippingPoint, ppmAverageRateDiff);
+
     this.setState({
       ppmDiff: `${calculateDiff(previous, previous ? currentPpm : 0)} PPM`,
       ppmPercentDiff: `${calculatePercentageDiff(
@@ -64,7 +73,10 @@ class InfoColumnHOC extends Component {
         previous ? currentPpm : 0,
       )} %`,
       diffPPMSubHeader,
+      diffAveragePPMSubHeader,
       diffPercentSubHeader,
+      ppmAverageRateDiff: `${ppmAverageRateDiff} PPM / YEAR`,
+      yearsUntilTipping: `${yearsUntilTipping} YEARS`,
     });
   };
 
@@ -73,10 +85,13 @@ class InfoColumnHOC extends Component {
     const {
       ppmDiff,
       diffPPMSubHeader,
+      diffAveragePPMSubHeader,
       ppmPercentDiff,
       diffPercentSubHeader,
+      ppmAverageRateDiff,
+      yearsUntilTipping,
     } = this.state;
-    if (rangeType !== ALL) {
+    if (rangeType !== ALL && rangeType !== PROJECTION) {
       return (
         <div className="flex-grid">
           <InfoColDiv
@@ -90,13 +105,29 @@ class InfoColumnHOC extends Component {
           />
         </div>
       );
+    } else if (rangeType === ALL) {
+      return (
+        <div className="flex-grid">
+          <InfoColDiv
             statInfo={`${currentPpm} PPM`}
+            subHeader={globalSubHeader}
+          />
+        </div>
+      );
     }
     return (
       <div className="flex-grid">
         <InfoColDiv
-          statInfo={`${currentPpm} PPM`}
-          subHeader={globalSubHeader}
+          statInfo={`${currentPpm} / ${hardcodedTippingPoint} PPM`}
+          subHeader={currentVsTippingSubHeader}
+        />
+        <InfoColDiv
+          statInfo={ppmAverageRateDiff}
+          subHeader={diffAveragePPMSubHeader}
+        />
+        <InfoColDiv
+          statInfo={yearsUntilTipping}
+          subHeader={untilTippingSubHeader}
         />
       </div>
     );
@@ -106,6 +137,8 @@ InfoColumnHOC.propTypes = {
   rangeType: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     .isRequired,
   currentPpm: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  priorDatePpm: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     .isRequired,
 };
 

@@ -23,6 +23,8 @@ import {
   fetchMonthWeekPpms,
   fetchYearPpms,
   fetchAllPpms,
+  fetchAndCalcProjectionPpms,
+  fetchOnePriorPpm,
 } from './redux/actions';
 
 import { ppmInfoAllSelector, ppmInfoSelector } from './redux/selectors';
@@ -86,6 +88,17 @@ export class ChartInfo extends Component {
         }
         break;
       }
+      case PROJECTION: {
+        if (shouldUpdate) {
+          // For calculating the average rate of ppm increase
+          const endpoint = `${queryDateRange(todaysDate, YEAR, 5)}&limit=1`; // TODO - don't hardcode to 5 years
+          this.props.fetchOnePriorPpm({ rangeType, endpoint });
+
+          // For drawing the graph
+          this.props.fetchAndCalcProjectionPpms();
+        }
+        break;
+      }
       default: {
         if (shouldUpdate) {
           this.props.fetchAllPpms();
@@ -104,7 +117,7 @@ export class ChartInfo extends Component {
   };
 
   render() {
-    const { currentPpm, loading } = this.props;
+    const { currentPpm, priorDatePpm, loading } = this.props;
     const { rangeType } = this.state;
     return (
       <div>
@@ -124,6 +137,7 @@ export class ChartInfo extends Component {
             data={this.props[rangeType]}
             rangeType={rangeType}
             currentPpm={currentPpm}
+            priorDatePpm={priorDatePpm}
           />
           <div className="graph-container">
             <LoadingWrapper
@@ -153,8 +167,9 @@ const mapStateToProps = state => ({
   [YEAR]: ppmInfoSelector(state, YEAR),
   [FIVE_YEAR]: ppmInfoSelector(state, FIVE_YEAR),
   [ALL]: ppmInfoAllSelector(state, ALL),
-  [PROJECTION]: ppmInfoAllSelector(state, ALL),
+  [PROJECTION]: ppmInfoAllSelector(state, PROJECTION),
   currentPpm: state.ppmInfo.currentPpm,
+  priorDatePpm: state.ppmInfo.priorDatePpm,
 });
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
@@ -163,6 +178,8 @@ const mapDispatchToProps = dispatch =>
       fetchMonthWeekPpms,
       fetchYearPpms,
       fetchAllPpms,
+      fetchAndCalcProjectionPpms,
+      fetchOnePriorPpm,
     },
     dispatch,
   );
@@ -170,24 +187,31 @@ export default connect(mapStateToProps, mapDispatchToProps)(ChartInfo);
 ChartInfo.propTypes = {
   loading: PropTypes.bool.isRequired,
   currentPpm: PropTypes.number.isRequired,
+  priorDatePpm: PropTypes.number.isRequired,
   fetchCurrentPpms: PropTypes.func.isRequired,
   fetchMonthWeekPpms: PropTypes.func.isRequired,
   fetchYearPpms: PropTypes.func.isRequired,
   fetchAllPpms: PropTypes.func.isRequired,
+  fetchAndCalcProjectionPpms: PropTypes.func.isRequired,
+  fetchOnePriorPpm: PropTypes.func.isRequired,
   error: PropTypes.string, // eslint-disable-line
 }; // TODO: Update the above create error handling issue
 ChartInfo.defaultProps = {
   error: '',
   loading: true,
   currentPpm: 0,
+  priorDatePpm: 0,
   [WEEK]: [],
   [MONTH]: [],
   [YEAR]: [],
   [FIVE_YEAR]: [],
   [ALL]: [],
+  [PROJECTION]: [],
   queryApi: () => {},
   fetchCurrentPpms: () => {},
   fetchMonthWeekPpms: () => {},
   fetchYearPpms: () => {},
   fetchAllPpms: () => {},
+  fetchAndCalcProjectionPpms: () => {},
+  fetchOnePriorPpm: () => {},
 };

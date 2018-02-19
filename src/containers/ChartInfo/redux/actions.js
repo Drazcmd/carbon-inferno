@@ -5,6 +5,8 @@ import {
   CURRENT_PPM_SUCCESS,
   PPM_LOAD_ITEMS_FAILURE,
   ALL_PPM_SUCCESS,
+  PROJECTION_PPM_SUCCESS,
+  ONE_PRIOR_PPM_SUCCESS,
   YEARS_PPM_SUCCESS,
   WEEK_MONTH_PPM_SUCCESS,
 } from './commands';
@@ -29,6 +31,19 @@ export const currentPpmSuccess = (currentPpm, totalPpmCount) => ({
 export const allPpmSuccess = results => ({
   type: ALL_PPM_SUCCESS,
   results,
+});
+
+export const projectionPpmSuccess = results => ({
+  type: PROJECTION_PPM_SUCCESS,
+  results,
+});
+
+export const onePriorPpmSuccess = (priorDatePpm, rangeType) => ({
+  type: ONE_PRIOR_PPM_SUCCESS,
+  results: {
+    priorDatePpm,
+  },
+  rangeType,
 });
 
 export const weekMonthPpmsSuccess = ({ results, rangeType }) => ({
@@ -57,6 +72,7 @@ export const fetchCurrentPpms = (
   return {};
 };
 
+
 export const fetchAllPpms = (endpoint = '/?ordering=+date&limit=') => async (
   dispatch,
   getState,
@@ -72,6 +88,42 @@ export const fetchAllPpms = (endpoint = '/?ordering=+date&limit=') => async (
   }
   return {};
 };
+
+// TODO - do the second half: calculate the other ppms!
+// right now it's practically a copy of fetchAllPpms
+export const fetchAndCalcProjectionPpms = (endpoint = '/?ordering=+date&limit=') => async (
+  dispatch,
+  getState,
+  api,
+) => {
+  try {
+    const { ppmInfo: { totalPpmCount } } = getState();
+    dispatch(loadingPpms());
+    const { results } = await fetchData(`${api}${endpoint}${totalPpmCount}`);
+    dispatch(projectionPpmSuccess(results));
+  } catch (err) {
+    dispatch(failedPpmFetch(err));
+  }
+  return {};
+};
+
+export const fetchOnePriorPpm = ({ endpoint, rangeType }) => async (
+  dispatch,
+  getState,
+  api,
+) => {
+  try {
+    dispatch(loadingPpms());
+    const priorDatePpmResponse = await fetchData(`${api}/${endpoint}`);
+    // TODO - when not hardcoding to 5 years, should probably change { ppm } to {ppm, date}
+    const { results: [{ ppm }] = [{}] } = priorDatePpmResponse;
+    dispatch(onePriorPpmSuccess(parseFloat(ppm, 10), rangeType));
+  } catch (err) {
+    dispatch(failedPpmFetch(err));
+  }
+  return {};
+};
+
 
 export const fetchMonthWeekPpms = ({ endpoint, rangeType }) => async (
   dispatch,
