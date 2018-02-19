@@ -14,7 +14,6 @@ const calculateSubHeader = (rangeType = '') => {
     diffPercentSubHeader: `IN THE PAST ${
       rangeType ? formatStr(rangeType) : ''
     } (%)`,
-    timeUntilTippingPoint: 'UNTIL TIPPING POINT',
   };
 };
 
