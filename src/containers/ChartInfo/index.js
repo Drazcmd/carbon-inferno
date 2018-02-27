@@ -45,14 +45,27 @@ const PpmResizedChart = windowSize(PpmChart);
 
 export class ChartInfo extends Component {
   state = {
-    rangeType: FIVE_YEAR, // Intitial date range query type
+    rangeType:
+      this.props.match.params && this.props.match.params.time
+        ? this.props.match.params.time
+        : FIVE_YEAR, // Intitial date range query type
   };
 
   componentDidMount() {
-    // query for current ppm
-    this.props.fetchCurrentPpms();
-    // Query for five years
-    this.queryApi(this.state.rangeType);
+    // Wait for the total number of records to load
+    // before requesting ALL records from the API.
+    if (this.state.rangeType === ALL) {
+      // query for current ppm and wait for limit
+      this.props.fetchCurrentPpms().then(() => {
+        // Query for current time period.
+        this.queryApi(this.state.rangeType);
+      });
+    } else {
+      // query for current ppm
+      this.props.fetchCurrentPpms();
+      // Query for current time period.
+      this.queryApi(this.state.rangeType);
+    }
   }
 
   queryApi = (rangeType) => {
@@ -128,6 +141,7 @@ export class ChartInfo extends Component {
                 className="time-choice-header"
                 items={timeHeaderLinks}
                 onClick={this.handlePpmClick}
+                defaultSelected={this.state.rangeType}
               />
             }
           />
@@ -195,6 +209,7 @@ ChartInfo.propTypes = {
   fetchAndCalcProjectionPpms: PropTypes.func.isRequired,
   fetchOnePriorPpm: PropTypes.func.isRequired,
   error: PropTypes.string, // eslint-disable-line
+  match: PropTypes.object, // eslint-disable-line
 }; // TODO: Update the above create error handling issue
 ChartInfo.defaultProps = {
   error: '',
@@ -214,4 +229,5 @@ ChartInfo.defaultProps = {
   fetchAllPpms: () => {},
   fetchAndCalcProjectionPpms: () => {},
   fetchOnePriorPpm: () => {},
+  match: { params: null },
 };

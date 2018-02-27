@@ -56,11 +56,11 @@ export const ALL = 'all';
 export const PROJECTION = 'projection';
 
 export const timeHeaderLinks = [
-  { href: '#TODO', className: '', text: '1 Week', type: WEEK },
-  { href: '#TODO', className: '', text: '1 Month', type: MONTH },
-  { href: '#TODO', className: '', text: '1 Year', type: YEAR },
-  { href: '#TODO', className: '', text: '5 Years', type: FIVE_YEAR },
-  { href: '#TODO', className: '', text: 'All', type: ALL },
+  { href: WEEK, className: '', text: '1 Week', type: WEEK },
+  { href: MONTH, className: '', text: '1 Month', type: MONTH },
+  { href: YEAR, className: '', text: '1 Year', type: YEAR },
+  { href: FIVE_YEAR, className: '', text: '5 Years', type: FIVE_YEAR },
+  { href: ALL, className: '', text: 'All', type: ALL },
   { href: '#TODO', className: '', text: 'Projected', type: PROJECTION },
 ];
 
